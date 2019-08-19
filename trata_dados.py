@@ -29,6 +29,7 @@ class RetiraNumero:
 		# Um laço é feito para percorrer cada linha dos históricos e retirar os números individualmente
 		for i in self.compras['Histórico']:
 			resultado = list()
+			resultado_composto = list()
 			# Para retirar os números, é preciso utilizar Expressões Regulares para encontrar números(str) no meio dos históricos,
 			# pois eles estão juntos no mesmo campo.
 			filtro = re.findall('([0-9]+)',i)
@@ -39,13 +40,15 @@ class RetiraNumero:
 					pass
 				else:
 					resultado.append(item)
+			if (len(resultado) > 1):
+				resultado.pop(-1)
+			else:
+				pass
 			for item in resultado:
 				if(item == ""):
 					pass
 				else:
-					df = pd.DataFrame([resultado[0]])
-					resultado_final = df.drop_duplicates()
-					self.historico_das_compras.append(resultado_final)
+					self.historico_das_compras.append([resultado[0]])
 			
 	# As funcionalidades dessa função muito se assemelha com a anterior, o que muda é que aqui o foco está nos pagamentos e não nas compras,
 	# Por isso caso necessário consulte os comentários da função anterior.
@@ -62,13 +65,15 @@ class RetiraNumero:
 					pass
 				else:
 					resultado.append(item)
+			if (len(resultado) > 1):
+				resultado.pop(-1)
+			else:
+				pass
 			for item in resultado:
 				if(item == ""):
 					pass
 				else:
-					df = pd.DataFrame([resultado[0]])
-					resultado_final = df.drop_duplicates()
-					self.historico_dos_pagamentos.append(resultado_final)
+					self.historico_dos_pagamentos.append([resultado[0]])
 
 	def retira_sep_de_milhar(self):
 		for i in self.compras['Crédito']:
