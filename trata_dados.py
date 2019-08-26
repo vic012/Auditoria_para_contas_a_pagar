@@ -4,6 +4,7 @@ import pandas as pd
 # Importa as expressões regulares para lidar com os dados
 # dos csv's
 import re
+from datetime import datetime
 class RetiraNumero:
 	def __init__(self, arquivo_compra = "", arquivo_pagamento=""):
 		#-----------------------------
@@ -16,6 +17,7 @@ class RetiraNumero:
 		self.pagamentos = pd.read_csv(self.arquivo_pagamento, sep = ';', encoding = 'latin-1')
         # Receberá os números das notas fiscais de compra e pagamento
         # Essas varíavies são uma do tipo lista e receberão números inteiros
+		self.data = list()
 		self.historico_das_compras = list()
 		self.historico_dos_pagamentos = list()
 		self.valores_compras_formatados = list()
@@ -36,7 +38,7 @@ class RetiraNumero:
 			# Outro laço é criado para garantir que cada nota fiscal seja adicionada na lista self.historico_das_compras de um por um.
 			# E também os números serão retornados como inteiros
 			for item in filtro:
-				if(item == ""):
+				if(item == []):
 					pass
 				else:
 					resultado.append(item)
@@ -45,7 +47,7 @@ class RetiraNumero:
 			else:
 				pass
 			for item in resultado:
-				if(item == ""):
+				if(item == []):
 					pass
 				else:
 					self.historico_das_compras.append([resultado[0]])
@@ -61,7 +63,7 @@ class RetiraNumero:
 			# Outro laço é criado para garantir que cada nota fiscal seja adicionada na lista self.historico_das_compras de um por um.
 			# E também os números serão retornados como inteiros
 			for item in filtro:
-				if(item == ""):
+				if(item == []):
 					pass
 				else:
 					resultado.append(item)
@@ -70,7 +72,7 @@ class RetiraNumero:
 			else:
 				pass
 			for item in resultado:
-				if(item == ""):
+				if(item == []):
 					pass
 				else:
 					self.historico_dos_pagamentos.append([resultado[0]])
@@ -85,10 +87,16 @@ class RetiraNumero:
 			retira_virgula = retira_ponto.replace(',', '.')
 			self.valores_pagamentos_formatados.append(float(retira_virgula))
 
+	def melhora_data_compra(self):
+		for item in self.compras['Data']:
+			data = str(item)
+			self.data.append(data)
+
 	def cria_coluna_historico(self):
 		# Tendo separado os históricos das compras e dos pagamentos, agora criamos uma nova coluna
 		# ['Histórico separado'] contendo as NF's sem nenhuma influencia do histórico passado.
 		df_compras = pd.DataFrame(self.historico_das_compras)
+		self.compras['Data'] = self.data
 		self.compras['Histórico separado'] = df_compras
 		self.compras['Crédito'] = self.valores_compras_formatados
 		df_pagamentos = pd.DataFrame(self.historico_dos_pagamentos)
