@@ -2,8 +2,8 @@
 # Importa a biblioteca de interfaces Tkinter
 from tkinter import *
 from datetime import datetime
-from trata_dados import RetiraNumero
-from importa_dados import Conferencia
+from trata_dados1 import RetiraNumero
+from importa_dados1 import Conferencia
 #-----------------------------
 
 #-----------------------------
@@ -119,5 +119,8 @@ class Janela:
 		self.msgfeedback_conferencia["text"] = "Conferencia realizada com sucesso!"
 
 root = Tk()
+imagem = PhotoImage(file = '.\imagens\icon.png')
+root.title('Confere')
+root.iconphoto(False, imagem)
 Janela(root)
 root.mainloop()
