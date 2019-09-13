@@ -2,8 +2,8 @@
 # Importa a biblioteca de interfaces Tkinter
 from tkinter import *
 from datetime import datetime
-from trata_dados1 import RetiraNumero
-from importa_dados1 import Conferencia
+from trata_dados import RetiraNumero
+from importa_dados import Conferencia
 #-----------------------------
 
 #-----------------------------
@@ -114,7 +114,7 @@ class Janela:
 		arquivo_data = self.dados_data.get()
 		data_formatada = datetime.strptime(arquivo_data, '%d/%m/%Y').date()
 		confere = Conferencia(data_formatada)
-		confere.loop_compras()
+		confere.confronta()
 		confere.debug()
 		self.msgfeedback_conferencia["text"] = "Conferencia realizada com sucesso!"
 
