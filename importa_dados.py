@@ -62,12 +62,12 @@ class Conferencia:
 				historico_resultado = str()
 				for item in selec_compras['Histórico']:
 					historico_resultado = item
-				#Pega a data para o resultado
-				for item in selec_compras['Data']:
-					data_resultado = item
 				#Soma as compras
 				selec_compra_com_numero = (selec_compras.loc[(selec_compras['Número'] == n_fornecedor_atual)])
 				soma_compras = selec_compra_com_numero['Crédito'].sum().round(2)
+				#Pega a data para o resultado
+				for item in selec_compra_com_numero['Data']:
+					data_resultado = item
 				#Seleção dos pagamentos a prazo---------
 				selec_pagamentos_prazo = self.pagamentos.loc[(self.pagamentos['Histórico separado'] == nf_atual_compra) & (self.pagamentos['Número'] == n_fornecedor_atual) & (self.pagamentos['Tipo'] == 1)]
 				soma_pagamentos_prazo = selec_pagamentos_prazo['Débito'].sum().round(2)
@@ -110,53 +110,46 @@ class Conferencia:
 				#Se a soma da compra não for igual a soma dos pagamentos à vista e nem dos pagamentos a prazo
 				#deve verificar se há devoluções correspondentes ou pagamentos
 				else:
-					if(soma_compras != soma_pagamentos_prazo):
-					#Deve verificar se a diferença é uma devolução, senão 
-					#senão a compra precisa ser averiguada
-						diferenca = (soma_compras - soma_pagamentos_prazo).round(2) if (soma_compras - soma_pagamentos_prazo).round(2) > 0 else (soma_pagamentos_prazo - soma_compras).round(2)	
-						if(diferenca == soma_devolucao) or (diferenca == soma_devolucao_dividida) or (diferenca == soma_devolucao + soma_pagamentos_a_vista) or (diferenca == soma_devolucao + soma_devolucao_dividida):
-							self.resultado.append('A compra está certa')
-						elif(data_resultado == data_pagamento_a_vista):
-							self.resultado.append('A compra está certa')
-						elif(soma_compras == soma_pagamentos_prazo + soma_pagamentos_a_vista):
-							self.resultado.append('A compra está certa')
-						else:
-							self.resultado.append('A {} em {} Precisa ser averiguada'.format(historico_resultado, data_resultado))
-					elif(soma_compras != soma_pagamentos_a_vista):
-					#Deve verificar se a diferença é uma devolução, senão 
-					#senão a compra precisa ser averiguada
-						diferenca = (soma_compras - soma_pagamentos_a_vista).round(2) if (soma_compras - soma_pagamentos_a_vista).round(2) > 0 else (soma_pagamentos_a_vista - soma_compras).round(2)
-						if(diferenca == soma_devolucao) or (diferenca == soma_devolucao_dividida):
-							self.resultado.append('A compra está certa')
-						elif(data_resultado != data_pagamento_a_vista):
+					#Se a soma dos pagamentos a prazo + à vista forem igual a compra e verificar
+					#a data dos pagamentos à vista
+					if(soma_compras == soma_pagamentos_prazo + soma_pagamentos_a_vista) or (soma_pagamentos_prazo + soma_pagamentos_a_vista == soma_compras):
+						if(data_resultado != data_pagamento_a_vista):
 							self.resultado.append('O pagamento da {} em {} Está com data errada'.format (historico_resultado, data_resultado))
-						elif(soma_compras == soma_pagamentos_a_vista + soma_devolucao) or (soma_compras == soma_pagamentos_a_vista + soma_devolucao_dividida):
+						else:
 							self.resultado.append('A compra está certa')
-						
-				'''elif(soma_pagamentos_a_vista > 0.0)	& (soma_compras != soma_pagamentos_a_vista) & (soma_pagamentos_prazo > 0.0):
-				
-					diferenca = (soma_compras - soma_pagamentos_a_vista).round(2) if (soma_compras - soma_pagamentos_a_vista).round(2) > 0 else (soma_pagamentos_a_vista - soma_compras).round(2)
-					if(diferenca == soma_devolucao) or (diferenca == soma_devolucao_dividida) or (diferenca == soma_devolucao + soma_pagamentos_a_vista) or (diferenca == soma_devolucao + soma_devolucao_dividida):
-						self.resultado.append('A compra está certa')
-					elif(data_resultado == data_pagamento_a_vista):
-						self.resultado.append('A compra está certa')
-					else:
-						self.resultado.append('A {} em {} Precisa ser averiguada'.format(historico_resultado, data_resultado))
-				#Se a soma da compra não for igual a soma dos pagamentos a prazo 
-				#deve verificar se há devoluções correspondentes ou pagamentos à vista correspondentes
-				elif(soma_pagamentos_prazo > 0.0) & (soma_compras != soma_pagamentos_prazo) & (soma_pagamentos_a_vista > 0.0):
-					
-					if(soma_pagamentos_prazo + soma_pagamentos_a_vista + (soma_devolucao if soma_devolucao > 0.0 and soma_devolucao_dividida <= 0.0 else soma_devolucao_dividida) == soma_compras):
-						self.resultado.append('A compra está certa')
-					diferenca = (soma_compras - soma_pagamentos_prazo).round(2) if (soma_compras - soma_pagamentos_prazo).round(2) > 0 else (soma_pagamentos_prazo - soma_compras).round(2)
-					if(diferenca == soma_devolucao) or (diferenca == soma_devolucao_dividida):
-						self.resultado.append('A compra está certa')
-					elif(diferenca == soma_pagamentos_a_vista):
-						self.resultado.append('A compra está certa')
-					else:
-						self.resultado.append('A {} em {} Precisa ser averiguada'.format(historico_resultado, data_resultado))
-				
-				'''		
+					#Compras que tem a data maior a data informada pelo usuário, verificar se tem devolução,
+					#pagamentos à vista ou se a diferença é igual a uma devolução
+					elif(soma_compras != 0.0) & (data_resultado >= self.arquivo_data):
+						diferenca = ((soma_compras - soma_pagamentos_prazo).round(2) if (soma_compras - soma_pagamentos_prazo).round(2) > 0 else (soma_pagamentos_prazo - soma_compras))
+						bool_selec_devol_isolada = (self.pagamentos.loc[(self.pagamentos['Número'] == n_fornecedor_atual) & (self.pagamentos['Débito'] == diferenca) & (self.pagamentos['Tipo'] == 0)])
+						selec_devol_isolada = bool_selec_devol_isolada['Débito'].round(2)
+						devolucao = []
+						for item in selec_devol_isolada:
+							devolucao = item
+						if(soma_compras == soma_devolucao) or (soma_compras == soma_devolucao_dividida):
+							self.resultado.append('A compra está certa')
+						elif(soma_compras != soma_pagamentos_prazo):
+							if(diferenca == devolucao) or (diferenca == soma_pagamentos_a_vista):
+								self.resultado.append('A compra está certa')
+							else:
+								self.resultado.append('A {} em {} Precisa ser averiguada'.format(historico_resultado, data_resultado))
+					##Compras que tem a data inferior a data informada pelo usuário, verificar se tem devolução,
+					#pagamentos à vista ou se a diferença é igual a uma devolução
+					elif(soma_compras != 0.0) & (data_resultado < self.arquivo_data):
+						diferenca = ((soma_compras - soma_pagamentos_prazo).round(2) if (soma_compras - soma_pagamentos_prazo).round(2) > 0 else (soma_pagamentos_prazo - soma_compras))
+						bool_selec_devol_isolada = (self.pagamentos.loc[(self.pagamentos['Número'] == n_fornecedor_atual) & (self.pagamentos['Débito'] == diferenca) & (self.pagamentos['Tipo'] == 0)])
+						selec_devol_isolada = bool_selec_devol_isolada['Débito'].round(2)
+						devolucao = []
+						for item in selec_devol_isolada:
+							devolucao = item
+						if(soma_compras == soma_devolucao) or (soma_compras == soma_devolucao_dividida):
+							self.resultado.append('A compra está certa')
+						elif(soma_compras != soma_pagamentos_prazo):
+							if(diferenca == devolucao) or (diferenca == soma_pagamentos_a_vista):
+								print(historico_resultado, 1)
+								self.resultado.append('A compra está certa')
+							else:
+								self.resultado.append('A {} em {} Precisa ser averiguada'.format(historico_resultado, data_resultado))
 
 	def debug(self):
 		df_resultado = pd.DataFrame(self.resultado)
