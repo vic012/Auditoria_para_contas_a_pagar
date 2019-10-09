@@ -13,7 +13,7 @@
 
 3) Logo após a conferência chega ao seu climax, onde será criado um outro (csv) contendo os erros encontrados e também as compras certas, assim o usuário pode abrir esse arquivo e com um simples filtro desconsiderar as compras certas e então poderá averiguar os erros.
 
-### Uma tarefa que grande parte dela demandaria semanas, agora pode ser realizada em dias ou, me arrisco dizer, horas.
+### Uma tarefa que grande parte dela demandaria dias, agora pode ser realizada em questão de minutos.
 
 # Instruções:
 1) Clone o repositório com todos os arquivos inclusive a pasta dados;
