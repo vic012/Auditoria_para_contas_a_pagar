@@ -16,3 +16,9 @@
 3) Logo após a conferência chega ao seu climax, onde será criado um outro (csv) contendo os erros encontrados e também as compras certas, assim o usuário pode abrir esse arquivo e com um simples filtro desconsiderar as compras certas e então poderá averiguar os erros.
 
 ### Uma tarefa que grande parte dela demandaria semanas, agora pode ser realizada em dias ou, me arrisco dizer, horas.
+
+# Instruções:
+1) Clone o repositório com todos os arquivos inclusive a pasta dados;
+2) Execute o arquivo janela.py, este será responsável de criar a interação entre o usuário e o script;
+
+* os arquivos csv na pasta dados, não são reais na verdade eles estão incompletos, eles servem apenas como exemplo, para uma melhor experiência, utilize arquivos reais com a mesma estrutura e tipo de arquivo que os apresentados nos exemplos na pasta dados.
