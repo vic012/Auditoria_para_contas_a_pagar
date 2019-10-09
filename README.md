@@ -3,8 +3,6 @@
 # O Objetivo do projeto
 ### O objetivo desse projeto é realizar uma tarefa trivial, mas que demanda muito tempo dos profissionais contábeis, essa tarefa consiste em averiguar longas páginas de relatórios contábeis, analisando se cada compra recebeu o seu devido pagamento, só que esses relatórios chegam a ter centenas de páginas com centenas de fornecedores diferentes e milhares de transações entre eles, sendo assim, esse script será capaz de realizar uma grande função afim de otimizar o tempo gasto, o script fará esta análise e retornará apenas as compras que apresentarem problemas afim de que os responsáveis possam analisar e realizar os devidos ajustes.
 
-# Linguagem do projeto: Python
-
 # Como funciona?
 1) o script abrirá uma janela solicitando três informações ao usuário:
  1.1 - O nome do arquivo (csv) das compras na pasta dados;
@@ -21,4 +19,6 @@
 1) Clone o repositório com todos os arquivos inclusive a pasta dados;
 2) Execute o arquivo janela.py, este será responsável de criar a interação entre o usuário e o script;
 
+* Linguagem do projeto: Python
 * os arquivos csv na pasta dados, não são reais na verdade eles estão incompletos, eles servem apenas como exemplo, para uma melhor experiência, utilize arquivos reais com a mesma estrutura e tipo de arquivo que os apresentados nos exemplos na pasta dados.
+* Microserviço: Pode ser que esse projeto não se aplique a sua necessidade, pois ele se aplica a uma demanda de um escritório que fornece os relatórios que são auditados por este script, se você não tiver esses relatórios (nos mesmos padrões dos que estão, como exemplo, na pasta dados) talvez não consiga usar o script, pois ele foi configurado para um formato específico de CSV, se esse for o seu caso, você pode criar uma estrutura que lhe posibilite usar o sistema (Uma boa ferramenta para esta função é o VBA).
