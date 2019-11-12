@@ -3,6 +3,7 @@
 import pandas as pd
 import re
 from datetime import datetime
+import pyautogui as pyg
 #-----------------------------
 
 #-----------------------------
@@ -38,8 +39,9 @@ class Conferencia:
 			data_pagamentos.append(datetime.strptime(item, '%d/%m/%Y').date())
 		novo_dataframe_pagamentos = pd.DataFrame(data_pagamentos)
 		self.pagamentos['Data'] = novo_dataframe_pagamentos
+		self.pagamentos.to_csv('dados/resultado da conferencia.csv', sep=';', index= False, encoding='latin-1')
 		self.conferir(df_atual)
-		
+
 	def conferir(self, df_atual):
 		#Seleciona a nf_atual
 		for item in df_atual['Histórico separado']:
@@ -53,11 +55,11 @@ class Conferencia:
 				selec_compras = self.compras.loc[(self.compras['Histórico separado'] == nf_atual)]
 				#Seleciona o número da nf da compra
 				for item in selec_compras['Histórico separado']:
-					nf_atual_compra = item
+					nf_atual_compra = int(item)
 				#Seleciona o número do fornecdor da compra atual
 				n_fornecedor_atual = int()
 				for item in selec_compras['Número']:
-					n_fornecedor_atual = item
+					n_fornecedor_atual = int(item)
 				#Pega os históricos para o resultado
 				historico_resultado = str()
 				for item in selec_compras['Histórico']:
@@ -146,7 +148,6 @@ class Conferencia:
 							self.resultado.append('A compra está certa')
 						elif(soma_compras != soma_pagamentos_prazo):
 							if(diferenca == devolucao) or (diferenca == soma_pagamentos_a_vista):
-								print(historico_resultado, 1)
 								self.resultado.append('A compra está certa')
 							else:
 								self.resultado.append('A {} em {} Precisa ser averiguada'.format(historico_resultado, data_resultado))

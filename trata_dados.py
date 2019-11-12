@@ -6,15 +6,16 @@ import pandas as pd
 import re
 from datetime import datetime
 class RetiraNumero:
-	def __init__(self, arquivo_compra = "", arquivo_pagamento=""):
+	def __init__(self, arquivo_compra ="", arquivo_pagamento=""):
 		#-----------------------------
 		# Lê os dados do csv e trata de acordo com a forma precisa para conferir
 
 		# Ativando a leitura do banco de dados pelo pandas (pd)
-		self.arquivo_compra = "dados\{}".format(arquivo_compra)
-		self.arquivo_pagamento = "dados\{}".format(arquivo_pagamento)
+		self.arquivo_compra = "dados\{}.csv".format(arquivo_compra)
+		self.arquivo_pagamento = "dados\{}.csv".format(arquivo_pagamento)
 		self.compras = pd.read_csv(self.arquivo_compra, sep = ';', encoding = 'latin-1')
 		self.pagamentos = pd.read_csv(self.arquivo_pagamento, sep = ';', encoding = 'latin-1')
+		self.pagamentos['Histórico'].replace(';', '')
         # Receberá os números das notas fiscais de compra e pagamento
         # Essas varíavies são uma do tipo lista e receberão números inteiros
 		self.data = list()
