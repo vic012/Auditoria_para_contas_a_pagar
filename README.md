@@ -8,6 +8,7 @@
  1.1 - O nome do arquivo (csv) das compras na pasta dados;
  1.2 - O nome do arquivo (csv) dos pagamentos também na pasta dados;
  1.3 - O primeiro dia do último mês do relatório, pois o último mês influencia nos saldos finais, por isso as compras acima desta data devem ser averiguadas de forma diferente das demais.
+ 1.4 - Baixe o arquivo Auditor.exe, ele é o instalador que trará todas as pré-configurações.
 
 2) Os arquivos serão tratados para serem conferidos, assim dois novos (csv's) serão criados: Compras ajustada e Pagamentos ajustados.
 
