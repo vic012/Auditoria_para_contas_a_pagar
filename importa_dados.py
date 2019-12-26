@@ -22,17 +22,19 @@ class Conferencia:
 		notas_fiscais = list()
 		for item in self.compras['Histórico separado']:
 			notas_fiscais.append(item)
-		#Cria um dataframe apenas com as NF para serem verificadas a cada
-		#loop.
+
+		#Cria um dataframe apenas com as NF para serem verificadas a cada loop.
 		df = pd.DataFrame(notas_fiscais)
 		df['Histórico separado'] = df
 		df_atual = pd.DataFrame(df['Histórico separado'])
+
 		#Oragniza as datas das compras e dos pagamentos
 		data_compras = list()
 		for item in self.compras['Data']:
 			data_compras.append(datetime.strptime(item, '%d/%m/%Y').date())
 		novo_dataframe_compras = pd.DataFrame(data_compras)
 		self.compras['Data'] = novo_dataframe_compras
+
 		#--------------------
 		data_pagamentos = list()
 		for item in self.pagamentos['Data']:
@@ -43,6 +45,33 @@ class Conferencia:
 		self.conferir(df_atual)
 
 	def conferir(self, df_atual):
+		#importar arquivos excel
+		#pagamentos = pd.read_csv('pagamentos ajustados.csv', sep=';', encoding='latin-1')
+		#dataframe = pd.DataFrame(self.pagamentos)
+
+		#Separar somente as devoluções
+		alldevolucoes = self.pagamentos.loc[(self.pagamentos['Tipo'] == 0)]
+		#PARA TESTES: alldevolucoes.to_csv('devolucao.csv', sep=';', index=False, encoding='latin-1')
+
+		#Selecionar ea agrupar as devoluções únicas, mas divididas
+		#devolucao_div = pd.read_csv('devolucao.csv', sep=';', encoding='latin-1')
+		agrupar = alldevolucoes.groupby(['Número', 'Histórico separado', 'Tipo']).sum().round(2)
+
+		#Excluir a coluna débito para permitir excluir as duplicações
+		alldevolucoes = alldevolucoes.drop('Débito', axis=1)
+
+		#Excluir as duplicações onde somente o débito diferenciava
+		alldevolucoes = alldevolucoes.drop_duplicates(keep='first')
+
+		#Criar uma nova coluna débito com os totais das devoluções divididas em um segmento apenas
+		valor_débito = list()
+		for item in agrupar['Débito']:
+			valor_débito.append(float(item))
+		alldevolucoes['Débito'] = valor_débito
+		
+		#Cria um novo arquivo com as novas devoluções
+		#PARA TESTES: alldevolucoes.to_csv('Devoluções.csv', sep=';', index=False, encoding='latin-1')
+		
 		#Seleciona a nf_atual
 		for item in df_atual['Histórico separado']:
 			if(item == 'Sem número'):
@@ -55,11 +84,15 @@ class Conferencia:
 				selec_compras = self.compras.loc[(self.compras['Histórico separado'] == nf_atual)]
 				#Seleciona o número da nf da compra
 				for item in selec_compras['Histórico separado']:
-					nf_atual_compra = int(item)
-				#Seleciona o número do fornecdor da compra atual
+					for pagamento in self.pagamentos['Histórico separado']:
+						if (type(pagamento) == type('')):
+							nf_atual_compra = str(item)
+						else:
+							nf_atual_compra = int(item)
+				#Seleciona o número do fornecedor da compra atual
 				n_fornecedor_atual = int()
 				for item in selec_compras['Número']:
-					n_fornecedor_atual = int(item)
+					n_fornecedor_atual = item
 				#Pega os históricos para o resultado
 				historico_resultado = str()
 				for item in selec_compras['Histórico']:
@@ -80,35 +113,38 @@ class Conferencia:
 				data_pagamento_a_vista = []
 				for item in selec_pagamentos_a_vista['Data']:
 					data_pagamento_a_vista = item
-				#Seleciona as devoluções ---------------
-				#Considera as devoluções integrais, sem divisão
-				selec_devolucao = self.pagamentos.loc[(self.pagamentos['Número'] == n_fornecedor_atual) & (self.pagamentos['Tipo'] == 0)]
-				soma_devolucao = selec_devolucao['Débito'].sum().round(2)
-				#Considera as devoluções divididas, mas com o mesmo histórico
-				selec_devolucao_dividida = selec_devolucao.loc[(selec_devolucao.duplicated('Histórico separado', keep=False))]
-				soma_devolucao_dividida = selec_devolucao_dividida['Débito'].sum().round(2)
-
-
+								
+																		
 				#Começa a conferencia---------------------------
-
+				#Deve verificar se a compra tem devolução integral
+				'''if(selec_devolucao.loc[(selec_devolucao['Débito'] == soma_compras)]).empty:
+					self.resultado.append('A compra está certa, utilização de devolução')
+					print(1)
+					continue'''
 				#Deve verificar se a soma da compra atual é igual a soma de seus pagamentos a prazo
 				if(soma_compras == soma_pagamentos_prazo):
 					self.resultado.append('A compra está certa')
+					continue
 				#Deve verificar se a soma da compra atual é igual a soma de seu pagamento à vista
 				elif(soma_compras == soma_pagamentos_a_vista):
 					#Se a data da compra à vista for dieferente da data da compra, há um problema
 					if(data_resultado == data_pagamento_a_vista):
 						self.resultado.append('A compra está certa')
+						continue
 					elif(data_resultado != data_pagamento_a_vista):
 						self.resultado.append('O pagamento da {} em {} Está com data errada'.format (historico_resultado, data_resultado))
+						continue
 				#Deve verificar se as compras estão sem pagamentos, se sim considerar dois fatos
 				elif(soma_pagamentos_prazo == 0.0) & (soma_pagamentos_a_vista == 0.0):
+				# & (soma_devolucao == 0.0) & (soma_devolucao_dividida == 0.0):
 					#1º) Se a compra tiver data anterior a data informada pelo usuário: A compra está sem pagamento
 					if(data_resultado <= self.arquivo_data):
 						self.resultado.append('A {} em {} Está sem pagamento'.format(historico_resultado, data_resultado))
+						continue
 					#2º) Se a compra estiverem sem pagamento: retornar, sem pagamento.
 					else:
 						self.resultado.append('A {} em {} Provavelmente será paga nos próximos meses'.format(historico_resultado, data_resultado))
+						continue
 				#Se a soma da compra não for igual a soma dos pagamentos à vista e nem dos pagamentos a prazo
 				#deve verificar se há devoluções correspondentes ou pagamentos
 				else:
@@ -117,46 +153,66 @@ class Conferencia:
 					if(soma_compras == soma_pagamentos_prazo + soma_pagamentos_a_vista) or (soma_pagamentos_prazo + soma_pagamentos_a_vista == soma_compras):
 						if(data_resultado != data_pagamento_a_vista):
 							self.resultado.append('O pagamento da {} em {} Está com data errada'.format (historico_resultado, data_resultado))
+							continue
 						else:
 							self.resultado.append('A compra está certa')
+							continue
 					#Compras que tem a data maior a data informada pelo usuário, verificar se tem devolução,
 					#pagamentos à vista ou se a diferença é igual a uma devolução
 					elif(soma_compras != 0.0) & (data_resultado >= self.arquivo_data):
 						diferenca = ((soma_compras - soma_pagamentos_prazo).round(2) if (soma_compras - soma_pagamentos_prazo).round(2) > 0 else (soma_pagamentos_prazo - soma_compras))
-						bool_selec_devol_isolada = (self.pagamentos.loc[(self.pagamentos['Número'] == n_fornecedor_atual) & (self.pagamentos['Débito'] == diferenca) & (self.pagamentos['Tipo'] == 0)])
-						selec_devol_isolada = bool_selec_devol_isolada['Débito'].round(2)
-						devolucao = []
-						for item in selec_devol_isolada:
-							devolucao = item
-						if(soma_compras == soma_devolucao) or (soma_compras == soma_devolucao_dividida):
-							self.resultado.append('A compra está certa')
+						#bool_selec_devol_isolada = (self.pagamentos.loc[(self.pagamentos['Número'] == n_fornecedor_atual) & (self.pagamentos['Débito'] == diferenca) & (self.pagamentos['Tipo'] == 0)])
+						#selec_devol_isolada = bool_selec_devol_isolada['Débito'].round(2)
+						#devolucao = []
+						#for item in selec_devol_isolada:
+						#devolucao = item
+						selec_devolucao = alldevolucoes['Débito'].loc[(alldevolucoes['Número'] == n_fornecedor_atual) & (alldevolucoes['Débito'] == diferenca)]
+						selec_numero_devolucao = alldevolucoes['Histórico separado'].loc[(alldevolucoes['Número'] == n_fornecedor_atual) & (alldevolucoes['Débito'] == diferenca)].to_string(header=False)
+						if(diferenca == selec_devolucao).any():
+							string_devolucao = selec_devolucao = alldevolucoes['Débito'].loc[(alldevolucoes['Número'] == n_fornecedor_atual) & (alldevolucoes['Débito'] == diferenca)].to_string(header=False)
+							self.resultado.append('A compra está certa, o valor da devolução utilizada: {}, e o Nº da NF: {} '.format(string_devolucao, selec_numero_devolucao))
+							continue
 						elif(soma_compras != soma_pagamentos_prazo):
-							if(diferenca == devolucao) or (diferenca == soma_pagamentos_a_vista):
+							if(diferenca == selec_devolucao).any():
+								self.resultado.append('A compra está certa, o valor da devolução utilizada: {}, e o Nº da NF: {} '.format(string_devolucao, selec_numero_devolucao))
+								continue
+							elif(diferenca == soma_pagamentos_a_vista):
 								self.resultado.append('A compra está certa')
+								continue
 							else:
 								self.resultado.append('A {} em {} Precisa ser averiguada'.format(historico_resultado, data_resultado))
+								continue
 					##Compras que tem a data inferior a data informada pelo usuário, verificar se tem devolução,
 					#pagamentos à vista ou se a diferença é igual a uma devolução
 					elif(soma_compras != 0.0) & (data_resultado < self.arquivo_data):
 						diferenca = ((soma_compras - soma_pagamentos_prazo).round(2) if (soma_compras - soma_pagamentos_prazo).round(2) > 0 else (soma_pagamentos_prazo - soma_compras))
-						bool_selec_devol_isolada = (self.pagamentos.loc[(self.pagamentos['Número'] == n_fornecedor_atual) & (self.pagamentos['Débito'] == diferenca) & (self.pagamentos['Tipo'] == 0)])
-						selec_devol_isolada = bool_selec_devol_isolada['Débito'].round(2)
-						devolucao = []
-						for item in selec_devol_isolada:
-							devolucao = item
-						if(soma_compras == soma_devolucao) or (soma_compras == soma_devolucao_dividida):
-							self.resultado.append('A compra está certa')
+						#bool_selec_devol_isolada = (self.pagamentos.loc[(self.pagamentos['Número'] == n_fornecedor_atual) & (self.pagamentos['Débito'] == diferenca) & (self.pagamentos['Tipo'] == 0)])
+						#selec_devol_isolada = bool_selec_devol_isolada['Débito'].round(2)
+						#devolucao = []
+						#for item in selec_devol_isolada:
+						#	devolucao = item
+						selec_devolucao = alldevolucoes['Débito'].loc[(alldevolucoes['Número'] == n_fornecedor_atual) & (alldevolucoes['Débito'] == diferenca)]
+						selec_numero_devolucao = alldevolucoes['Histórico separado'].loc[(alldevolucoes['Número'] == n_fornecedor_atual) & (alldevolucoes['Débito'] == diferenca)].to_string(header=False)
+						if(diferenca == selec_devolucao).any():
+							string_devolucao = selec_devolucao = alldevolucoes['Débito'].loc[(alldevolucoes['Número'] == n_fornecedor_atual) & (alldevolucoes['Débito'] == diferenca)].to_string(header=False)
+							self.resultado.append('A compra está certa, o valor da devolução utilizada: {}, e o Nº da NF: {} '.format(string_devolucao, selec_numero_devolucao))
+							continue
 						elif(soma_compras != soma_pagamentos_prazo):
-							if(diferenca == devolucao) or (diferenca == soma_pagamentos_a_vista):
+							if(diferenca == selec_devolucao).any():
+								self.resultado.append('A compra está certa, o valor da devolução utilizada: {}, e o Nº da NF: {} '.format(string_devolucao, selec_numero_devolucao))
+								continue
+							elif(diferenca == soma_pagamentos_a_vista):
 								self.resultado.append('A compra está certa')
+								continue
 							else:
 								self.resultado.append('A {} em {} Precisa ser averiguada'.format(historico_resultado, data_resultado))
+								continue
 
 	def debug(self):
 		df_resultado = pd.DataFrame(self.resultado)
 		self.compras['Resultado'] = df_resultado
 		#df_final = pd.DataFrame(df_resultado['Resultado'])
-		self.compras.to_csv('dados/resultado da conferencia.csv', sep=';', index= False, encoding='latin-1')	
+		self.compras.to_excel('dados/resultado da conferencia.xlsx', index= False, encoding='latin-1')	
 		print('O arquivo de resultado foi criado')
 #----------------------------
 '''

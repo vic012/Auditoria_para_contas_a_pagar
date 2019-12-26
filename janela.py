@@ -31,7 +31,7 @@ class Janela:
         self.arquivo_compra['padx'] = 6
         self.arquivo_compra['background'] = '#7988b5'
         self.arquivo_compra.pack()
-        self.compra_label = Label(self.arquivo_compra, text='Compra:                      ')
+        self.compra_label = Label(self.arquivo_compra, text='Arquivo de compra:      ')
         self.compra_label['foreground'] = '#ffffff'
         self.compra_label['background'] = '#7988b5'
         self.compra_label.pack(side=LEFT)
@@ -45,7 +45,7 @@ class Janela:
         self.arquivo_pagamento['padx'] = 6
         self.arquivo_pagamento['background'] = '#7988b5'
         self.arquivo_pagamento.pack()
-        self.pagamento_label = Label(self.arquivo_pagamento, text='Pagamento:                ')
+        self.pagamento_label = Label(self.arquivo_pagamento, text='Arquivo de Pagamento:')
         self.pagamento_label['foreground'] = '#ffffff'
         self.pagamento_label['background'] = '#7988b5'
         self.pagamento_label.pack(side=LEFT)
@@ -59,7 +59,7 @@ class Janela:
         self.arquivo_data['padx'] = 6
         self.arquivo_data['background'] = '#7988b5'
         self.arquivo_data.pack()
-        self.data_label = Label(self.arquivo_data, text='1º dia do último mês:')
+        self.data_label = Label(self.arquivo_data, text='1º dia do último mês:    ')
         self.data_label['foreground'] = '#ffffff'
         self.data_label['background'] = '#7988b5'
         self.data_label.pack(side=LEFT)
@@ -97,6 +97,7 @@ class Janela:
         self.feedback_conferencia = Frame(master)
         self.feedback_conferencia.pack()
         self.msgfeedback_conferencia = Label(self.feedback_conferencia, text='', font=self.fonte_padrao)
+        self.msgfeedback_conferencia['foreground'] = '#ffffff'
         self.msgfeedback_conferencia['background'] = '#7988b5'
         self.msgfeedback_conferencia.pack(side=LEFT)
 
@@ -106,8 +107,8 @@ class Janela:
         self.butões_sair.pack()
 
         self.autentica = Button(self.butões)
-        self.autentica['text'] = 'Realizar conferência'
-        self.autentica['font'] = ('Calibri', '10', 'bold')
+        self.autentica['text'] = 'REALIZAR CONFERÊNCIA'
+        self.autentica['font'] = ('Calibri', '8', 'bold')
         self.autentica['foreground'] = '#f68327'
         self.autentica['background'] = '#03125a'
         self.autentica['width'] = 20
@@ -149,7 +150,7 @@ class Janela:
 root = Tk()
 imagem = PhotoImage(file='.\\imagens\\icon.png')
 root.configure(background='#7988b5')
-root.title('Confere')
+root.title('Auditor')
 root.iconphoto(False, imagem)
 Janela(root)
 root.mainloop()
