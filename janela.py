@@ -31,7 +31,7 @@ class Janela:
         self.arquivo_compra['padx'] = 6
         self.arquivo_compra['background'] = '#7988b5'
         self.arquivo_compra.pack()
-        self.compra_label = Label(self.arquivo_compra, text='Arquivo de compra:      ')
+        self.compra_label = Label(self.arquivo_compra, text='Arquivo de Compra:      ')
         self.compra_label['foreground'] = '#ffffff'
         self.compra_label['background'] = '#7988b5'
         self.compra_label.pack(side=LEFT)
