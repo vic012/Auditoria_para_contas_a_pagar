@@ -4,6 +4,7 @@ import pandas as pd
 from tkinter import *
 from datetime import datetime
 import re
+import matplotlib.pyplot as plt
 #-----------------------------
 
 #-----------------------------
@@ -328,6 +329,8 @@ class Conferencia:
 								self.resultado.append('A {} em {} Precisa ser averiguada'.format(historico_resultado, data_resultado))
 								continue
 
+		#Os Dados do gráfico
+		self.quantidade_de_compras_analizadas.append(quantidade_de_compras_analizadas)
 		self.contagem_certa.append(contagem_certa)
 		self.contagem_certa_com_devolucao.append(contagem_certa_com_devolucao)
 		self.contagem_averiguada.append(contagem_averiguada)
@@ -335,7 +338,6 @@ class Conferencia:
 		self.contagem_com_pagamento_errado.append(contagem_com_pagamento_errado)
 		self.contagem_sem_pagamento.append(contagem_sem_pagamento)
 		self.contagem_sem_numero.append(contagem_sem_numero)
-		self.quantidade_de_compras_analizadas.append(quantidade_de_compras_analizadas)
 
 	def debug(self):
 		df_resultado = pd.DataFrame(self.resultado)
@@ -345,6 +347,31 @@ class Conferencia:
 		new_df.to_excel('dados/resultado da conferencia.xlsx', index= False, encoding='latin-1')
 		print('O arquivo de resultado foi criado')
 
+		#CRIANDO O GRÁFICO DE BARRAS
+		#dados
+		eixo_y = [self.contagem_certa[0], self.contagem_certa_com_devolucao[0],
+					self.contagem_averiguada[0], self.contagem_de_saldo[0],
+					self.contagem_com_pagamento_errado[0], self.contagem_sem_pagamento[0],
+					self.contagem_sem_numero[0]]
+		eixo_x = [str(self.contagem_certa[0]), str(self.contagem_certa_com_devolucao[0]),
+					str(self.contagem_averiguada[0]), str(self.contagem_de_saldo[0]),
+					str(self.contagem_com_pagamento_errado[0]), str(self.contagem_sem_pagamento[0]),
+					str(self.contagem_sem_numero[0])]
+
+		plt.bar(eixo_x[0], eixo_y[0], color='#8f05f7')
+		plt.bar(eixo_x[1], eixo_y[1], color='#f705ad')
+		plt.bar(eixo_x[2], eixo_y[2], color='#05f7f7')
+		plt.bar(eixo_x[3], eixo_y[3], color='#05f74f')
+		plt.bar(eixo_x[4], eixo_y[4], color='#e8f705')
+		plt.bar(eixo_x[5], eixo_y[5], color='#f75305')
+		plt.bar(eixo_x[6], eixo_y[6], color='#311102')
+		plt.ylabel('Quantidade por tipo de erro')
+		plt.xlabel('Tipo de erro')
+		plt.title('Foram analisadas: {} compras'.format(self.quantidade_de_compras_analizadas[0]))
+		plt.legend(('Compra certa', 'Compra certa com utilização de devolução', 'Compra que precisa ser averiguada',
+					'Compra (Saldo para próximos meses)', 'Compra com pagamento à vista errado', 'Compra sem pagamento',
+					'Lançamento sem Nº de NF'))
+		plt.show()
 #----------------------------
 '''
 Links úteis:

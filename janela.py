@@ -5,7 +5,6 @@ from datetime import datetime
 from trata_dados import RetiraNumero
 from importa_dados import Conferencia
 
-
 # -----------------------------
 
 # -----------------------------
@@ -18,22 +17,22 @@ class Janela:
 
         self.mensagem = Frame(master)
         self.mensagem['pady'] = 10
-        self.mensagem['background'] = '#7988b5'
+        self.mensagem['background'] = '#036f79'
         self.mensagem.pack()
 
         self.titulo = Label(self.mensagem, text='Insira o nome dos arquivos')
         self.titulo['font'] = ('Calibri', '12')
         self.titulo['foreground'] = '#ffffff'
-        self.titulo['background'] = '#7988b5'
+        self.titulo['background'] = '#036f79'
         self.titulo.pack()
 
         self.arquivo_compra = Frame(master)
         self.arquivo_compra['padx'] = 6
-        self.arquivo_compra['background'] = '#7988b5'
+        self.arquivo_compra['background'] = '#036f79'
         self.arquivo_compra.pack()
         self.compra_label = Label(self.arquivo_compra, text='Arquivo de Compra:      ')
         self.compra_label['foreground'] = '#ffffff'
-        self.compra_label['background'] = '#7988b5'
+        self.compra_label['background'] = '#036f79'
         self.compra_label.pack(side=LEFT)
 
         self.dados_compras = Entry(self.arquivo_compra)
@@ -43,11 +42,11 @@ class Janela:
 
         self.arquivo_pagamento = Frame(master)
         self.arquivo_pagamento['padx'] = 6
-        self.arquivo_pagamento['background'] = '#7988b5'
+        self.arquivo_pagamento['background'] = '#036f79'
         self.arquivo_pagamento.pack()
         self.pagamento_label = Label(self.arquivo_pagamento, text='Arquivo de Pagamento:')
         self.pagamento_label['foreground'] = '#ffffff'
-        self.pagamento_label['background'] = '#7988b5'
+        self.pagamento_label['background'] = '#036f79'
         self.pagamento_label.pack(side=LEFT)
 
         self.dados_pagamentos = Entry(self.arquivo_pagamento)
@@ -57,11 +56,11 @@ class Janela:
 
         self.arquivo_data = Frame(master)
         self.arquivo_data['padx'] = 6
-        self.arquivo_data['background'] = '#7988b5'
+        self.arquivo_data['background'] = '#036f79'
         self.arquivo_data.pack()
         self.data_label = Label(self.arquivo_data, text='1º dia do último mês:    ')
         self.data_label['foreground'] = '#ffffff'
-        self.data_label['background'] = '#7988b5'
+        self.data_label['background'] = '#036f79'
         self.data_label.pack(side=LEFT)
 
         self.dados_data = Entry(self.arquivo_data)
@@ -71,13 +70,13 @@ class Janela:
 
         self.butões = Frame(master)
         self.butões['pady'] = 10
-        self.butões['background'] = '#7988b5'
+        self.butões['background'] = '#036f79'
         self.butões.pack()
 
         self.feedback = Frame(master)
         self.feedback.pack()
         self.msgfeedback = Label(self.feedback, text='', font=self.fonte_padrao)
-        self.msgfeedback['background'] = '#7988b5'
+        self.msgfeedback['background'] = '#036f79'
         self.msgfeedback.pack(side=LEFT)
 
         self.autentica = Button(self.butões)
@@ -91,19 +90,19 @@ class Janela:
 
         self.butões = Frame(master)
         self.butões['pady'] = 8
-        self.butões['background'] = '#7988b5'
+        self.butões['background'] = '#036f79'
         self.butões.pack()
 
         self.feedback_conferencia = Frame(master)
         self.feedback_conferencia.pack()
         self.msgfeedback_conferencia = Label(self.feedback_conferencia, text='', font=self.fonte_padrao)
         self.msgfeedback_conferencia['foreground'] = '#ffffff'
-        self.msgfeedback_conferencia['background'] = '#7988b5'
+        self.msgfeedback_conferencia['background'] = '#036f79'
         self.msgfeedback_conferencia.pack(side=LEFT)
 
         self.butões_sair = Frame(master)
         self.butões_sair['pady'] = 12
-        self.butões_sair['background'] = '#7988b5'
+        self.butões_sair['background'] = '#036f79'
         self.butões_sair.pack()
 
         self.autentica = Button(self.butões)
@@ -136,20 +135,26 @@ class Janela:
         organiza.novo_arquivo()
         self.msgfeedback['text'] = 'Os arquivos foram ajustados com sucesso!'
         self.msgfeedback['foreground'] = '#ffffff'
-        self.msgfeedback['background'] = '#7988b5'
+        self.msgfeedback['background'] = '#036f79'
         
     def confere(self):
+        hora_inicial = datetime.now()
+        minutos_iniciais = hora_inicial.minute
         arquivo_data = self.dados_data.get()
         data_formatada = datetime.strptime(arquivo_data, '%d/%m/%Y').date()
         confere = Conferencia(data_formatada)
         confere.organiza_cenario()
-        confere.debug()
-        self.msgfeedback_conferencia['text'] = 'Conferência realizada com sucesso!'
+        hora_final = datetime.now()
+        minutos_finais = hora_final.minute
+        segundos_finais = hora_final.second
+        tempo_gasto = minutos_finais - minutos_iniciais
+        self.msgfeedback_conferencia['text'] = 'Conferência realizada com sucesso em {}m e {}s !'.format(tempo_gasto, segundos_finais)
         self.msgfeedback_conferencia['foreground'] = '#ffffff'
-
+        confere.debug()
+        
 root = Tk()
-imagem = PhotoImage(file='.\\imagens\\icon.png')
-root.configure(background='#7988b5')
+imagem = PhotoImage(file='.\\imagens\\images.png')
+root.configure(background='#036f79')
 root.title('Auditor')
 root.iconphoto(False, imagem)
 Janela(root)
