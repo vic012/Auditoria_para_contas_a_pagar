@@ -1,14 +1,13 @@
 #encoding='utf-8'
 # Importa a biblioteca do pandas
 import pandas as pd
-import re
+from tkinter import *
 from datetime import datetime
-import pyautogui as pyg
+import re
 #-----------------------------
 
 #-----------------------------
 class Conferencia:
-
 	def __init__(self, arquivo_data):
 		# Ler e importa os novos arquivos
 		self.compras = pd.read_csv('dados\compras ajustadas.csv', sep=';', encoding='latin-1')
@@ -16,6 +15,14 @@ class Conferencia:
 		# Variavel para o loop que contará a contagem necessária para percorrer as compras
 		self.arquivo_data = arquivo_data
 		self.resultado = list()
+		self.quantidade_de_compras_analizadas = list()
+		self.contagem_certa = list()
+		self.contagem_certa_com_devolucao = list()
+		self.contagem_averiguada = list()
+		self.contagem_de_saldo = list()
+		self.contagem_com_pagamento_errado = list()
+		self.contagem_sem_pagamento = list()
+		self.contagem_sem_numero = list()
 
 	def organiza_cenario(self):
 		#Seleciona todas as nf's das compras e as coloca em uma lista
@@ -53,67 +60,93 @@ class Conferencia:
 		#Essa função deverá cocatenar o número da NF com o número do fornecedor, gerando assim um número único
 		
 		#Históricos das NF_atual-------------------------------------------------------------------------------
-		#__Cria uma lista para armazenar as notas fiscais
-		nota_fiscal_sem_numero = list()
-		for numero_da_nf in df_atual['Histórico separado']:
-			#__Selecionar os números dos fornecedores com a nota fiscal pesquisada
-			selecionar_numero = df_atual['Número'].loc[(df_atual['Histórico separado'] == numero_da_nf)]
-			lista_para_df = list()
-			for item in selecionar_numero:
-				lista_para_df.append(item)
-			df_df_atual = pd.DataFrame(lista_para_df)
-			df_df_atual.drop_duplicates(keep='first', inplace=False)
-			lista_para_numeros = list()
-			for item in df_df_atual:
-				lista_para_numeros.append(str(item))
-			novo_numero = list()
-			for item in lista_para_numeros:
-				novo_numero.append(numero_da_nf + item)
-			for item in novo_numero:
-				nota_fiscal_sem_numero.append(item)
-		df_atual['Histórico cocatenado'] = nota_fiscal_sem_numero
+		#__Cria uma lista para armazenar os históricos
+		lista_para_historico = list()
+		#__Cria uma lista para armazenar os números
+		lista_para_numero = list()
+		for historico in df_atual['Histórico separado']:
+			if(historico == 'Sem número'):
+				lista_para_historico.append('*')
+			else:
+				lista_para_historico.append(str(historico))
+		for numero in df_atual['Número']:
+			lista_para_numero.append(str(numero))
+		#Cria um dataframe para os históricos retirados
+		df_lista_para_historico = pd.DataFrame(lista_para_historico)
+		#Cria um dataframe para os números retirados
+		df_lista_para_numero = pd.DataFrame(lista_para_numero)
+		#Cocatena os históricos com os númerosm formando assim um número de nf único
+		lista_para_novo_historico = df_lista_para_historico + df_lista_para_numero
+		#Cria um novo título
+		df_atual['Histórico cocatenado'] = lista_para_novo_historico
+		resultado = list()
+		for item in df_atual['Histórico cocatenado']:
+			filtro = re.findall('([*])',item)
+			if(filtro == []):
+				resultado.append(item)
+			else:
+				resultado.append('Sem número')
+		df_atual['Histórico cocatenado'] = resultado
+		# para teste: df_atual.to_excel('Teste.xlsx', index=False, encoding=False)
 		#-------------------------------------------------------------------------------------------------------
 		#Históricos das compras-------------------------------------------------------------------------------
-		#__Cria uma lista para armazenar as notas fiscais
-		nota_fiscal_sem_numero_compras = list()
-		for numero_da_nf_com in self.compras['Histórico separado']:
-			#__Selecionar os números dos fornecedores com a nota fiscal pesquisada
-			selecionar_numero_com = self.compras['Número'].loc[(self.compras['Histórico separado'] == numero_da_nf_com)]
-			lista_para_df = list()
-			for item in selecionar_numero_com:
-				lista_para_df.append(item)
-			df_compras = pd.DataFrame(lista_para_df)
-			df_compras.drop_duplicates(keep='first', inplace=False)
-			lista_para_numeros_com = list()
-			for item in selecionar_numero_com:
-				lista_para_numeros_com.append(str(item))
-			novo_numero_com = list()
-			for item in lista_para_numeros:
-				novo_numero_com.append(numero_da_nf_com + item)
-			for item in novo_numero_com:
-				nota_fiscal_sem_numero_compras.append(item)
-		self.compras['Histórico cocatenado'] = nota_fiscal_sem_numero_compras
+		#__Cria uma lista para armazenar os históricos
+		lista_para_historico_compras = list()
+		#__Cria uma lista para armazenar os números
+		lista_para_numero_compras = list()
+		for historico_compras in self.compras['Histórico separado']:
+			if(historico_compras == 'Sem número'):
+				lista_para_historico_compras.append('*')
+			else:
+				lista_para_historico_compras.append(str(historico_compras))
+		for numero_compras in self.compras['Número']:
+			lista_para_numero_compras.append(str(numero_compras))
+		#Cria um dataframe para os históricos retirados
+		df_lista_para_historico_compras = pd.DataFrame(lista_para_historico_compras)
+		#Cria um dataframe para os números retirados
+		df_lista_para_numero_compras = pd.DataFrame(lista_para_numero_compras)
+		#Cocatena os históricos com os númerosm formando assim um número de nf único
+		lista_para_novo_historico_compras = df_lista_para_historico_compras + df_lista_para_numero_compras
+		#Cria um novo título
+		self.compras['Histórico cocatenado'] = lista_para_novo_historico_compras
+		resultado_compras = list()
+		for compras in self.compras['Histórico cocatenado']:
+			filtro_compras = re.findall('([*])',compras)
+			if(filtro_compras == []):
+				resultado_compras.append(compras)
+			else:
+				resultado_compras.append('Sem número')
+		self.compras['Histórico cocatenado'] = resultado_compras
+		#self.compras.to_excel('Teste.xlsx', index=False, encoding=False)
 		#-------------------------------------------------------------------------------------------------------
 		#Históricos dos pagamentos------------------------------------------------------------------------------
-		#__Cria uma lista para armazenar as notas fiscais
-		nota_fiscal_sem_numero_pagamentos = list()
-		for numero_da_nf_pag in self.pagamentos['Histórico separado']:
-			#__Selecionar os números dos fornecedores com a nota fiscal pesquisada
-			selecionar_numero_pag = self.pagamentos['Número'].loc[(self.pagamentos['Histórico separado'] == numero_da_nf_pag)]
-			lista_para_df = list()
-			for item in selecionar_numero_pag:
-				lista_para_df.append(item)
-			df_pagamentos = pd.DataFrame(lista_para_df)
-			df_pagamentos.drop_duplicates(keep='first', inplace=False)
-			lista_para_numeros_pag = list()
-			for item in selecionar_numero_pag:
-				lista_para_numeros_pag.append(str(item))
-			novo_numero_pag = list()
-			for item in lista_para_numeros_pag:
-				novo_numero_pag.append(numero_da_nf_pag + item)
-			for item in novo_numero_pag:
-				nota_fiscal_sem_numero_pagamentos.append(item)
-		self.pagamentos['Histórico cocatenado'] = nota_fiscal_sem_numero_pagamentos
+		#__Cria uma lista para armazenar os históricos
+		lista_para_historico_pagamentos = list()
+		#__Cria uma lista para armazenar os números
+		lista_para_numero_pagamentos = list()
+		for historico_pagamentos in self.pagamentos['Histórico separado']:
+			if(historico_pagamentos == 'Sem número'):
+				lista_para_historico_pagamentos.append('*')
+			else:
+				lista_para_historico_pagamentos.append(str(historico_pagamentos))
+		for numero_pagamentos in self.pagamentos['Número']:
+			lista_para_numero_pagamentos.append(str(numero_pagamentos))
+		#Cria um dataframe para os históricos retirados
+		df_lista_para_historico_pagamentos = pd.DataFrame(lista_para_historico_pagamentos)
+		#Cria um dataframe para os números retirados
+		df_lista_para_numero_pagamentos = pd.DataFrame(lista_para_numero_pagamentos)
+		#Cocatena os históricos com os númerosm formando assim um número de nf único
+		lista_para_novo_historico_pagamentos = df_lista_para_historico_pagamentos + df_lista_para_numero_pagamentos
+		#Cria um novo título
+		self.pagamentos['Histórico cocatenado'] = lista_para_novo_historico_pagamentos
+		resultado_pagamentos = list()
+		for pagamentos in self.pagamentos['Histórico cocatenado']:
+			filtro_pagamentos = re.findall('([*])',pagamentos)
+			if(filtro_pagamentos == []):
+				resultado_pagamentos.append(pagamentos)
+			else:
+				resultado_pagamentos.append('Sem número')
+		self.pagamentos['Histórico cocatenado'] = resultado_pagamentos
 		#-------------------------------------------------------------------------------------------------------
 		self.conferir(df_atual)
 
@@ -145,9 +178,21 @@ class Conferencia:
 		#Cria um novo arquivo com as novas devoluções
 		#PARA TESTES: alldevolucoes.to_csv('Devoluções.csv', sep=';', index=False, encoding='latin-1')
 		
+		#tipos de informações para o gráfico
+		#contagem dos erros
+		quantidade_de_compras_analizadas = len(self.compras['Data'])
+		contagem_certa = 0
+		contagem_certa_com_devolucao = 0
+		contagem_averiguada = 0
+		contagem_de_saldo = 0
+		contagem_com_pagamento_errado = 0
+		contagem_sem_pagamento = 0
+		contagem_sem_numero = 0
+
 		#Seleciona a nf_atual
 		for item in df_atual['Histórico cocatenado']:
 			if(item == 'Sem número'):
+				contagem_sem_numero += 1
 				self.resultado.append('Lançamento sem número de NF, por favor, corrigir')
 				continue
 			else:
@@ -193,15 +238,18 @@ class Conferencia:
 				#Começa a conferencia---------------------------
 				#Deve verificar se a soma da compra atual é igual a soma de seus pagamentos a prazo
 				if(soma_compras == soma_pagamentos_prazo):
+					contagem_certa += 1
 					self.resultado.append('A compra está certa')
 					continue
 				#Deve verificar se a soma da compra atual é igual a soma de seu pagamento à vista
 				elif(soma_compras == soma_pagamentos_a_vista):
 					#Se a data da compra à vista for dieferente da data da compra, há um problema
 					if(data_resultado == data_pagamento_a_vista):
+						contagem_certa += 1
 						self.resultado.append('A compra está certa')
 						continue
 					elif(data_resultado != data_pagamento_a_vista):
+						contagem_com_pagamento_errado += 1
 						self.resultado.append('O pagamento da {} em {} Está com data errada'.format(historico_resultado, data_resultado))
 						continue
 				#Deve verificar se as compras estão sem pagamentos, se sim considerar dois fatos
@@ -209,10 +257,12 @@ class Conferencia:
 				# & (soma_devolucao == 0.0) & (soma_devolucao_dividida == 0.0):
 					#1º) Se a compra tiver data anterior a data informada pelo usuário: A compra está sem pagamento
 					if(data_resultado <= self.arquivo_data):
+						contagem_sem_pagamento += 1
 						self.resultado.append('A {} em {} Está sem pagamento'.format(historico_resultado, data_resultado))
 						continue
 					#2º) Se a compra estiverem sem pagamento: retornar, sem pagamento.
 					else:
+						contagem_de_saldo += 1
 						self.resultado.append('A {} em {} Provavelmente será paga nos próximos meses'.format(historico_resultado, data_resultado))
 						continue
 				#Se a soma da compra não for igual a soma dos pagamentos à vista e nem dos pagamentos a prazo
@@ -222,9 +272,11 @@ class Conferencia:
 					#a data dos pagamentos à vista
 					if(soma_compras == soma_pagamentos_prazo + soma_pagamentos_a_vista) or (soma_pagamentos_prazo + soma_pagamentos_a_vista == soma_compras):
 						if(data_resultado != data_pagamento_a_vista):
+							contagem_com_pagamento_errado += 1
 							self.resultado.append('O pagamento da {} em {} Está com data errada'.format(historico_resultado, data_resultado))
 							continue
 						else:
+							contagem_certa += 1
 							self.resultado.append('A compra está certa')
 							continue
 					#Compras que tem a data maior a data informada pelo usuário, verificar se tem devolução,
@@ -235,16 +287,20 @@ class Conferencia:
 						selec_numero_devolucao = alldevolucoes['Histórico separado'].loc[(alldevolucoes['Número'] == n_fornecedor_atual) & (alldevolucoes['Débito'] == diferenca)].to_string(header=False)
 						if(diferenca == selec_devolucao).any():
 							string_devolucao = selec_devolucao = alldevolucoes['Débito'].loc[(alldevolucoes['Número'] == n_fornecedor_atual) & (alldevolucoes['Débito'] == diferenca)].to_string(header=False)
+							contagem_certa_com_devolucao += 1
 							self.resultado.append('A compra está certa, o valor da devolução utilizada: {}, e o Nº da NF: {} '.format(string_devolucao, selec_numero_devolucao))
 							continue
 						elif(soma_compras != soma_pagamentos_prazo):
 							if(diferenca == selec_devolucao).any():
+								contagem_certa_com_devolucao += 1
 								self.resultado.append('A compra está certa, o valor da devolução utilizada: {}, e o Nº da NF: {} '.format(string_devolucao, selec_numero_devolucao))
 								continue
 							elif(diferenca == soma_pagamentos_a_vista):
+								contagem_certa += 1
 								self.resultado.append('A compra está certa')
 								continue
 							else:
+								contagem_averiguada += 1
 								self.resultado.append('A {} em {} Precisa ser averiguada'.format(historico_resultado, data_resultado))
 								continue
 					##Compras que tem a data inferior a data informada pelo usuário, verificar se tem devolução,
@@ -255,25 +311,40 @@ class Conferencia:
 						selec_numero_devolucao = alldevolucoes['Histórico separado'].loc[(alldevolucoes['Número'] == n_fornecedor_atual) & (alldevolucoes['Débito'] == diferenca)].to_string(header=False)
 						if(diferenca == selec_devolucao).any():
 							string_devolucao = selec_devolucao = alldevolucoes['Débito'].loc[(alldevolucoes['Número'] == n_fornecedor_atual) & (alldevolucoes['Débito'] == diferenca)].to_string(header=False)
+							contagem_certa_com_devolucao += 1
 							self.resultado.append('A compra está certa, o valor da devolução utilizada: {}, e o Nº da NF: {} '.format(string_devolucao, selec_numero_devolucao))
 							continue
 						elif(soma_compras != soma_pagamentos_prazo):
 							if(diferenca == selec_devolucao).any():
+								contagem_certa_com_devolucao += 1
 								self.resultado.append('A compra está certa, o valor da devolução utilizada: {}, e o Nº da NF: {} '.format(string_devolucao, selec_numero_devolucao))
 								continue
 							elif(diferenca == soma_pagamentos_a_vista):
+								contagem_certa += 1
 								self.resultado.append('A compra está certa')
 								continue
 							else:
+								contagem_averiguada += 1
 								self.resultado.append('A {} em {} Precisa ser averiguada'.format(historico_resultado, data_resultado))
 								continue
+
+		self.contagem_certa.append(contagem_certa)
+		self.contagem_certa_com_devolucao.append(contagem_certa_com_devolucao)
+		self.contagem_averiguada.append(contagem_averiguada)
+		self.contagem_de_saldo.append(contagem_de_saldo)
+		self.contagem_com_pagamento_errado.append(contagem_com_pagamento_errado)
+		self.contagem_sem_pagamento.append(contagem_sem_pagamento)
+		self.contagem_sem_numero.append(contagem_sem_numero)
+		self.quantidade_de_compras_analizadas.append(quantidade_de_compras_analizadas)
 
 	def debug(self):
 		df_resultado = pd.DataFrame(self.resultado)
 		self.compras['Resultado'] = df_resultado
 		#df_final = pd.DataFrame(df_resultado['Resultado'])
-		self.compras.to_excel('dados/resultado da conferencia.xlsx', index= False, encoding='latin-1')	
+		new_df = self.compras.drop('Histórico cocatenado', axis=1)
+		new_df.to_excel('dados/resultado da conferencia.xlsx', index= False, encoding='latin-1')
 		print('O arquivo de resultado foi criado')
+
 #----------------------------
 '''
 Links úteis:
