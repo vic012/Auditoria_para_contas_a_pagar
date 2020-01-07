@@ -19,10 +19,11 @@
 # Instruções:
 1) Clone a pasta Dados e o arquivo "Download do drive" para o seu PC;
 2) Abra o txt "Download do drive", nele há um link (repositório do google drive) que contém um executável com todas as pastas do projeto e seus arquivos, depois de baixar o Auditor.exe execute-o, ele fará a pré-instalação do software;
-3) Copia a pasta dados que você clonou do repositório para o caminho dist/janela e se houver ja uma pasta chamada dados substitua pela "dados" que você baixou, *Não mude o nome da pasta dados, o software vai procurar por ela*
+3) Copie a pasta dados que você clonou do repositório para o caminho dist/janela e se houver ja uma pasta chamada dados substitua pela "dados" que você baixou, *Não mude o nome da pasta dados, o software vai procurar por ela*
 4) Agora crie um atalho da pasta |dados| para a área de trabalho (mude seu ícone se quiser, existem opções na pasta imagem), essa pasta será onde você vai inserir os arquivos de excel do seu sistema, *nesse caso, os arquivos para teste: Compras e pagamentos ambos em .CSV já estão na pasta dados que você copiou do desse repositório Github;
 5) Volte a pasta dist e crie um atalho do executável janela.exe para a pasta |dados|, ele será o responsável por analisar os dados.
 
 * Linguagem do projeto: Python
 * os arquivos csv na pasta dados, não são reais na verdade eles estão incompletos, eles servem apenas como exemplo, para uma melhor experiência, utilize arquivos reais com a mesma estrutura e tipo de arquivo que os apresentados nos exemplos na pasta dados.
 * Microserviço: Pode ser que esse projeto não se aplique a sua necessidade, pois ele se aplica a uma demanda de um escritório que fornece os relatórios que são auditados por este script, se você não tiver esses relatórios (nos mesmos padrões dos que estão, como exemplo, na pasta dados) talvez não consiga usar o script, pois ele foi configurado para um formato específico de CSV, se esse for o seu caso, você pode criar uma estrutura que lhe posibilite usar o sistema (Uma boa ferramenta para esta função é o VBA para formatar os CSV ao seu gosto).
+* Há no repositório um módulo em VBA que você pode utilizar para organizar os seus dados em CSV.
