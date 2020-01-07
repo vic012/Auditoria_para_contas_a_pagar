@@ -18,7 +18,7 @@
 
 # Instruções:
 1) Clone o repositório com todos os arquivos inclusive a pasta dados;
-2) Execute o arquivo Auditor.exe, ele fará a pré-instalação do software;
+2) Abra o txt "Download do drive", nele há um link (repositório do google) drive que contém um executável com todas as pastas do projeto e seus arquivos, depois de baixar o Auditor.exe  execute-o, ele fará a pré-instalação do software;
 3) Depois de instalado vá no PATH padrão: C:\Program files\auditor\dist\janela;
 4) Agora crie um atalho da pasta |dados| para a área de trabalho (mude seu ícone se quiser), essa pasta será onde você vai inserir os arquivos de excel do seu sistema;
 5) Volte a pasta dist e crie um atalho para a pata |dados| do arquivo janela.exe, ele será o responsável por analisar os dados.
